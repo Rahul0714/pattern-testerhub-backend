@@ -86,10 +86,25 @@ router.get("/applied/:userId", auth, async (req, res) => {
   try {
     const patterns = await Pattern.find({
       applicants: req.params.userId,
-    }).populate("creator", "username");
-    res.json(patterns);
+    })
+      .populate("creator", "username")
+      .lean();
+
+    // Add status to each pattern
+    const patternsWithStatus = patterns.map((pattern) => {
+      const isSelected = pattern.selectedTesters.some(
+        (testerId) => testerId.toString() === req.params.userId.toString()
+      );
+      return {
+        ...pattern,
+        status: isSelected ? "Approved" : "Pending",
+      };
+    });
+
+    res.json(patternsWithStatus);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error fetching applied patterns:", err);
+    res.status(500).json({ message: "Server error: " + err.message });
   }
 });
 
@@ -148,3 +163,5 @@ router.get("/created/:creatorId", auth, async (req, res) => {
 });
 
 module.exports = router;
+
+

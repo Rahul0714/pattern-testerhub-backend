@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "decision-tree": "^0.3.7",
     "express-fileupload": "^1.5.1",
     "socket.io": "^4.8.1"
   },
